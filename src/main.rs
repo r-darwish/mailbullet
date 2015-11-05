@@ -22,13 +22,11 @@ impl From<ParsingError> for ClientError { fn from(error: ParsingError) -> Client
 
 fn handle_client(mut stream: BufStream<TcpStream>) -> Result<(), ClientError>{
     loop {
-        let line = {
+        let command = {
             let mut buffer = String::new();
             try!(stream.read_line(&mut buffer));
-            buffer
+            try!(SmtpCommand::from_str(buffer.trim()))
         };
-
-        let command = try!(SmtpCommand::from_str(line.trim()));
 
         println!("{:?}", command);
     }
